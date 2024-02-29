@@ -9,7 +9,7 @@ import mongoose from "mongoose";
  */
 export const connectDB = async function () {
   const uri =
-    process.env.NODE_ENV === "production"
+    process.env.MONGO_ENVIRONMENT === "cloud"
       ? process.env.MONGO_URI
       : process.env.MONGO_LOCAL_URI;
 

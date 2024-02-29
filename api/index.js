@@ -9,6 +9,7 @@ import errorMiddleware from "./middleware/errorMiddleware.js";
 import "express-async-errors";
 
 import userRoutes from "./routes/userRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use(cookieParser());
 
 //* routes
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/auth", authRoutes);
 
 //* catch errors that were caught by the app
 app.use(errorMiddleware);
