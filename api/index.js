@@ -29,7 +29,7 @@ app.use(cookieParser());
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/auth", authRoutes);
 
-//* catch errors that were caught by the app
+//* global error handler
 app.use(errorMiddleware);
 
 //* connect to database and spin up server
