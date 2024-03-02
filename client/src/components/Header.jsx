@@ -7,7 +7,7 @@ export default function Header() {
       <div className="flex justify-between items-center">
         <Link to="/">
           <h1 className="font-bold text-sm sm:text-xl flex flex-wrap">
-            <span className="text-slate-500">Two Halls</span>
+            <span className="text-slate-500">Twohalls</span>
             <span className="text-slate-700">Estate</span>
           </h1>
         </Link>

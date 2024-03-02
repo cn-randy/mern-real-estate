@@ -13,5 +13,7 @@ import { StatusCodes } from "http-status-codes";
  * @returns {Promise<void>}
  */
 export const test = function (req, res, next) {
-  res.status(StatusCodes.CREATED).json({ message: "API route is working" });
+  res
+    .status(StatusCodes.CREATED)
+    .json({ success: true, message: "API route is working" });
 };

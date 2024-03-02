@@ -4,11 +4,11 @@
  * Optionally adds stack trace if app is not in production mode
  */
 class CustomErrorException extends Error {
-  constructor(message, statusCode, field = "unknown") {
+  constructor(message, statusCode, errors) {
     super(message);
 
     this.statusCode = statusCode;
-    this.field = field;
+    this.errors = errors;
 
     if (process.env.NODE_ENV !== "production") {
       Error.captureStackTrace(this, this.constructor);

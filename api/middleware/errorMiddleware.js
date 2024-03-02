@@ -10,39 +10,100 @@ export default function (err, req, res, next) {
 
   //* mongoDB errors
   //* handle invalid mongoDB id error
+
+  const errors = {};
+
   if (err.name === "CastError") {
     console.log("Invalid mongoDB id: ", err);
     const message = `Resource not found. Invalid ${err.path}`;
     error = new CustomErrorException(message, StatusCodes.NOT_FOUND, err.path);
-    return res
-      .status(error.statusCode)
-      .json({ message: error.message, field: error.path });
+    return res.status(error.statusCode).json({ success: err });
+    // return res
+    //   .status(error.statusCode)
+    //   .json({ success: false message: error.message, field: error.path });
   }
 
-  // mongo validation errors
+  /**
+   * mongoose validation errors
+   * mongoose returns a mongoose validation error object which fully describes
+   * all validation errors returned by the mongoose api. We are interested in
+   * the errors property which is an object where each property is an object
+   * that holds the error data for each field where there is an array.
+   * error data for a particular field,
+   * example
+   *     "errors": {
+   *         "password": {
+   *             "name": "ValidatorError",
+   *             "message": "Please enter your password.",
+   *             "properties": {
+   *                 "message": "Please enter your password.",
+   *                 "type": "required",
+   *                 "path": "password"
+   *             },
+   *             "kind": "required",
+   *             "path": "password"
+   *         },
+   *         "email": {
+   *             "name": "ValidatorError",
+   *             "message": "Please enter your email address.",
+   *             "properties": {
+   *                 "message": "Please enter your email address.",
+   *                 "type": "required",
+   *                 "path": "email"
+   *             },
+   *             "kind": "required",
+   *             "path": "email"
+   *         },
+   *         "username": {
+   *             "name": "ValidatorError",
+   *             "message": "Please enter your username.",
+   *             "properties": {
+   *                 "message": "Please enter your username.",
+   *                 "type": "required",
+   *                 "path": "username"
+   *             },
+   *             "kind": "required",
+   *             "path": "username"
+   *         }
+   *     }
+   */
   if (err.name === "ValidationError") {
-    console.log("Invalid mongoDB validation error: ", err);
-    const mongooseError = Object.values(err.errors).map((value) => ({
-      message: value.message,
-      path: value.path,
-    }));
-    error = new CustomErrorException(
-      mongooseError.message,
-      StatusCodes.BAD_REQUEST,
-      mongooseError.path,
-    );
-    return res
-      .status(error.statusCode)
-      .json({ message: error.message, field: error.path });
+    Object.entries(err.errors).forEach((error) => {
+      errors[error[0]] = { message: error[1].message };
+    });
+
+    return res.status(StatusCodes.BAD_REQUEST).json({ success: false, errors });
   }
 
-  // mongo Duplicate key error
+  /**
+   *   mongo Duplicate key error
+   *   Mongoose return a duplicate key error object when a unique constraint failes
+   *   Unique constraints are checked after all other validation rules and only
+   *   filres if all of those validations have passed.
+   *
+   *   Mongoose returns an error with the following properties
+   *   example:
+   *         {
+   *            err: {
+   *              "errors": {
+   *              "index": 0,
+   *              "code": 11000,
+   *              "keyPattern": {
+   *                 "username": 1
+   *              },
+   *              "keyValue": {
+   *                "username": "Fred"
+   *              }
+   *           }
+   *         }
+   */
   if (err.code === 11000) {
-    const message = `Duplicate ${Object.keys(err.keyValue)} entered`;
-    const path = Object.keys(err.keyPattern)[0];
-    error = new CustomErrorException(message, StatusCodes.BAD_REQUEST, path);
-    console.log("Duplicate error: ", message, path);
-    return res.status(error.statusCode).json({ message, path });
+    const field = Object.keys(err.keyValue)[0];
+    errors[field] = {
+      message: `${field} is already in use`,
+    };
+
+    return res.status(StatusCodes.BAD_REQUEST).json({ success: false, errors });
   }
 
   // Json web token errors
@@ -57,7 +118,7 @@ export default function (err, req, res, next) {
     );
     return res
       .status(error.statusCode)
-      .json({ message: error.message, field: error.path });
+      .json({ success: false, message: error.message, field: error.path });
   }
 
   // handle expired jwt error
@@ -74,24 +135,11 @@ export default function (err, req, res, next) {
       .json({ message: error.message, field: error.path });
   }
 
-  // All other development mode errors
-  if (process.env.MONGO_ENVIRONMENT !== "cloud") {
-    console.log("All other development errors: ", err);
-    return res.status(error.statusCode).json({
-      message: error.message,
-      error: err,
-      field: "unknown",
-      stack: err.stack,
-    });
-  }
-
-  // all other production mode errors
-  if (process.env.MONGO_ENVIRONMENT === "cloud") {
-    console.log("All other production mode errors: ", err);
-    return res.status(error.statusCode).json({
-      message: error.message,
-      error: err,
-      field: "unknown",
-    });
-  }
+  // All other errors
+  console.log("All other errors: ", err);
+  return res.status(error.statusCode).json({
+    success: false,
+    errors: err.errors,
+    stack: process.env.MONGO_ENVIRONMENT !== "cloud" && err.stack,
+  });
 }

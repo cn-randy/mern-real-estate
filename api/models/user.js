@@ -5,14 +5,20 @@ const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      required: [true, "Please enter your username."],
       unique: true,
+      required: [true, "Please enter your username."],
     },
     email: {
       type: String,
-      required: [true, "Please enter your email address."],
-      email: ["Please enter a valid email address."],
       unique: true,
+      required: [true, "Please enter your email address."],
+      validate: {
+        validator: function (email) {
+          var re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+          return re.test(email);
+        },
+        message: "Please enter a valid email address.",
+      },
     },
     password: {
       type: String,
