@@ -46,13 +46,12 @@ export const signin = async function (req, res) {
       StatusCodes.NOT_FOUND,
       {
         success: false,
-        errors: { system: { message: "Invalid credentials" } },
+        system: { message: "Invalid credentials" },
       },
     );
   }
 
   // verify password
-  console.log("shit ", password);
   const isAuthenticated = validUser.comparePassword(password);
   if (!isAuthenticated) {
     throw new CustomErrorException(
@@ -60,7 +59,7 @@ export const signin = async function (req, res) {
       StatusCodes.CONFLICT,
       {
         success: false,
-        errors: { system: { message: "Invalid credentials" } },
+        system: { message: "Invalid credentials" },
       },
     );
   }

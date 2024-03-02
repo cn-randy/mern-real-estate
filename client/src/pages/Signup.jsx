@@ -33,7 +33,6 @@ export default function Signup() {
       const data = await response.json();
 
       if (data.success === false) {
-        console.log("Trial Error: ", data);
         setErrors(data.errors);
         setIsLoading(false);
         return;
@@ -43,7 +42,6 @@ export default function Signup() {
       setIsLoading(false);
       navigate("/sign-in");
     } catch (error) {
-      console.log(error);
       setErrors(error);
       setIsLoading(false);
     }
@@ -107,7 +105,7 @@ export default function Signup() {
             className="bg-slate-700 text-white p-3 rounded-lg w-full uppercase hover:opacity-95 disabled:opacity-80"
             disabled={isLoading}
           >
-            {isLoading ? "Saving user..." : "Sign up"}
+            {isLoading ? "Registering user..." : "Sign up"}
           </button>
         </div>
       </form>
