@@ -34,11 +34,13 @@ export default function Signup() {
       const data = await response.json();
 
       if (data.success === false) {
+        // registration failed
         setErrors(data.errors);
         setIsLoading(false);
         return;
       }
 
+      // rgistration success
       setErrors(null);
       setIsLoading(false);
       navigate("/sign-in");

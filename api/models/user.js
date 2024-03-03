@@ -35,11 +35,17 @@ const userSchema = new mongoose.Schema(
           "Passwords must contain at least 1 upper case letter, 1 lowercase letter, 1 number and 1 special character (!@#$%^&*?()+-,.:?/<>{}[]). and be between 8 and 15 characters in length",
       },
     },
+    avatar: {
+      type: String,
+      default:
+        "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%3Fid%3DOIP.GHGGLYe7gDfZUzF_tElxiQHaHa%26pid%3DApi%26h%3D160&f=1&ipt=09c0293c9832c8015d39d01a16ab323145180a791179fda2e6afffe519f176e6&ipo=images",
+    },
   },
   { timestamps: true },
 );
 
 userSchema.pre("save", function (next) {
+  console.log("User: ", this.password);
   if (!this.isModified("password")) {
     return next();
   }
