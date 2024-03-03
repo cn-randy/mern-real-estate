@@ -7,6 +7,8 @@ import {
   signInFailure,
 } from "../store/user/userSlice.js";
 
+import Oauth from "../components/Oauth.jsx";
+
 export default function Signin() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -93,6 +95,7 @@ export default function Signin() {
             {isLoading ? "Logging in user..." : "Sign in"}
           </button>
         </div>
+        <Oauth />
       </form>
       <div className="flex gap-2 mt-5">
         <p>
